@@ -18,7 +18,6 @@ router.register(r'order-items', OrderItemViewSet, basename='orderitem')
 urlpatterns = [
     path("table-from-token/<str:token>/", TableFromTokenView.as_view()),
 
-
     path('', include(router.urls)),
 ]
 

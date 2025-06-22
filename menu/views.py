@@ -1,4 +1,6 @@
+import requests
 from rest_framework import viewsets, status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -80,6 +82,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         table_id = request.data.get('table_id')
         product_id = request.data.get('product')
+        quantity = request.data.get('quantity', 1)  # 🔹 Вот здесь получаем quantity
         options = request.data.get('options', [])
 
         if not table_id or not product_id:
@@ -93,13 +96,15 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # Проверяем существующий открытый заказ
         order = table.orders.filter(status='open').first()
         if not order:
-            # Если открытого заказа нет — создаём новый
             order = Order.objects.create(table=table)
 
-        # Создаём OrderItem
-        order_item = OrderItem.objects.create(order=order, product_id=product_id)
+        # ✅ Передаём quantity при создании
+        order_item = OrderItem.objects.create(
+            order=order,
+            product_id=product_id,
+            quantity=quantity  # 🔥 Фикс здесь
+        )
 
-        # Добавляем опции
         if options:
             order_item.options.set(options)
 
@@ -115,3 +120,8 @@ class TableFromTokenView(APIView):
             return Response({"table_id": table.id})
         except Table.DoesNotExist:
             return Response({"error": "Invalid token"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+

@@ -97,13 +97,15 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'table', 'table_id', 'created_at', 'status', 'closed_at', 'items']
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
     options = serializers.PrimaryKeyRelatedField(queryset=Option.objects.all(), many=True)
     table_id = serializers.PrimaryKeyRelatedField(
         queryset=Table.objects.all(),
         write_only=True
     )
-
+    quantity = serializers.IntegerField(required=False, default=1, min_value=1)
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'quantity', 'options', 'table_id']
