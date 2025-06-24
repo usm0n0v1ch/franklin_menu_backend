@@ -12,7 +12,7 @@ from .models import (
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = "__all__"
 
 
 # Продукт
@@ -26,14 +26,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'category', 'category_id', 'photo']
+        fields = "__all__"
 
 
 # Столик
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
-        fields = ['id', 'number', 'qr_token']
+        fields = "__all__"
         read_only_fields = ['qr_token']
 
 
@@ -53,7 +53,7 @@ class OptionTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OptionType
-        fields = ['id', 'name', 'applies_to', 'applies_to_ids']
+        fields = "__all__"
 
 
 # Конкретная опция (например: "лёгкий", "яблоко", "с мятой")
@@ -67,7 +67,7 @@ class OptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Option
-        fields = ['id', 'name', 'type', 'type_id','photo', 'price']
+        fields = "__all__"
 
 
 class OrderItemInlineSerializer(serializers.ModelSerializer):
@@ -77,7 +77,7 @@ class OrderItemInlineSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'options', 'total_price']
+        fields = "__all__"
 
     def get_total_price(self, obj):
         product_price = obj.product.price
@@ -96,7 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'table', 'table_id', 'created_at', 'status', 'closed_at', 'items']
+        fields ="__all__"
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -108,7 +108,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     quantity = serializers.IntegerField(required=False, default=1, min_value=1)
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'options', 'table_id']
+        fields = "__all__"
         extra_kwargs = {
             'order': {'read_only': True},
         }
