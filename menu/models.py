@@ -64,7 +64,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     options = models.ManyToManyField(Option, blank=True)
-
-
+    is_done = models.BooleanField(default=False)
+    done_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"{self.quantity} x {self.product.name} (Order #{self.order.id})"

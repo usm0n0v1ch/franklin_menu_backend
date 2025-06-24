@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('call-waiter/', views.call_waiter, name='call-waiter'),
-    path('waiter-status/<int:table_id>/', views.waiter_status, name='waiter-status'),
-    path('telegram-webhook/', views.telegram_webhook, name='telegram-webhook'),
+    path('new_orders/', views.new_orders),
+    path('mark_done/<int:item_id>/', views.mark_done),
 ]

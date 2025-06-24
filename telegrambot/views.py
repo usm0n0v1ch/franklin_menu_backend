@@ -1,76 +1,37 @@
+from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import WaiterCall
-from .telegram_config import TELEGRAM_TOKEN
-from .utils import send_waiter_request, update_waiter_status
-import json
-import requests
 
-@api_view(['POST'])
-def call_waiter(request):
-    table_id = request.data.get('table_id')
-    if not table_id:
-        return Response({'error': 'table_id is required'}, status=400)
-
-    call = send_waiter_request(table_id)
-    if call:
-        return Response({
-            'status': call.status,
-            'called_at': call.called_at,
-            'message_id': call.message_id
-        })
-    return Response({'error': 'Failed to call waiter'}, status=500)
-
-
-@csrf_exempt
-def telegram_webhook(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-            callback_query = data.get('callback_query')
-
-            if callback_query:
-                message = callback_query.get('message', {})
-                callback_data = callback_query.get('data')
-                message_id = message.get('message_id')
-
-                if callback_data and message_id:
-                    action, table_id = callback_data.split('_')
-
-                    # Подтверждаем нажатие кнопки
-                    requests.post(
-                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
-                        json={'callback_query_id': callback_query['id']}
-                    )
-
-                    # Обновляем статус
-                    if action == 'coming':
-                        update_waiter_status(
-                            table_id=int(table_id),
-                            status='coming',
-                            message_id=message_id
-                        )
-
-                    return JsonResponse({'status': 'ok'})
-
-        except Exception as e:
-            print(f"Webhook error: {str(e)}")
-
-    return JsonResponse({'status': 'ok'})
+from menu.models import OrderItem
+from telegrambot.serializers import TelegramOrderItemSerializer
 
 
 @api_view(['GET'])
-def waiter_status(request, table_id):
-    call = WaiterCall.objects.filter(table_id=table_id).order_by('-called_at').first()
+def new_orders(request):
+    role = request.query_params.get('role')
+    role_category_map = {
+        'hookah': ['Кальяны'],
+        'cook': ['Блюда'],
+        'waiter': ['Напитки', 'Прочее'],
+    }
 
-    if not call:
-        return Response({'error': 'No calls found'}, status=404)
+    categories = role_category_map.get(role, [])
+    order_items = OrderItem.objects.filter(
+        is_done=False,
+        order__status='open',
+        product__category__name__in=categories
+    ).select_related('product', 'order', 'product__category', 'order__table').prefetch_related('options__type')
 
-    return Response({
-        'status': call.status,
-        'called_at': call.called_at,
-        'coming_at': call.coming_at,
-        'arrived_at': call.arrived_at
-    })
+    serializer = TelegramOrderItemSerializer(order_items, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def mark_done(request, item_id):
+    try:
+        item = OrderItem.objects.get(id=item_id)
+        item.is_done = True
+        item.done_at = timezone.now()  # сохраняем время
+        item.save()
+        return Response({"status": "ok", "done_at": item.done_at})
+    except OrderItem.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)

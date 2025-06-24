@@ -114,3 +114,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
         }
 
 
+class OrderItemReadSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    order = OrderSerializer(read_only=True)
+    options = OptionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = "__all__"

@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 
@@ -142,3 +142,30 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
 
 
+# TELEGRAM_BOT_TOKENS = {
+#     'hookah': os.getenv('HOOKAH_BOT_TOKEN', '8039708999:AAGfnGGnoZLL2_wzWk_9hVJeSxWqg8886gA'),
+#     'cook': os.getenv('COOK_BOT_TOKEN', '7937803037:AAEk2kGyIDDm1u0a4KVOLtET0moUKWDXRMM'),
+#     'waiter': os.getenv('WAITER_BOT_TOKEN', '7412228739:AAGsDU2DSXpaz8db17uqm7Za5kT-f3M-kSo'),
+#     'universal': os.getenv('UNIVERSAL_BOT_TOKEN', '7947420504:AAHf8xrHF_y61qa5CUqxZc15DiMlrSxs-Ik'),
+# }
+
+
+TELEGRAM_BOT_TOKENS = {
+    'hookah': '8039708999:AAGfnGGnoZLL2_wzWk_9hVJeSxWqg8886gA',
+    'cook': '7937803037:AAEk2kGyIDDm1u0a4KVOLtET0moUKWDXRMM',
+    'waiter': '7412228739:AAGsDU2DSXpaz8db17uqm7Za5kT-f3M-kSo',
+    'universal': '7947420504:AAHf8xrHF_y61qa5CUqxZc15DiMlrSxs-Ik',
+}
+
+
+
+ALLOWED_TELEGRAM_USERNAMES = ['usm0n0v1ch']
+
+
+TELEGRAM_USER_ROLES = {
+    'usm0n0v1ch': 'waiter',
+    'anaptyx': 'cook',
+    'anaptyxuz': 'hookah',
+}
+
+TELEGRAM_UNIVERSAL_TOKEN ='7947420504:AAHf8xrHF_y61qa5CUqxZc15DiMlrSxs-Ik'
